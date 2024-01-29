@@ -16,31 +16,31 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 350,
-              width: size.width,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(70),
-                  ),
-                  color: Colors.blue),
-              child: const Center(
-                child: Text(
-                  "SignIn ",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40,
-                      color: Colors.white),
+      body: Column(
+        children: [
+          Container(
+            height: 350,
+            width: size.width,
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(70),
                 ),
+                color: Colors.blue),
+            child: const Center(
+              child: Text(
+                "SignIn ",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40,
+                    color: Colors.white),
               ),
             ),
-            const SizedBox(
-              height: 30,
-            ),
-            Padding(
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -86,8 +86,8 @@ class _SignInPageState extends State<SignInPage> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
