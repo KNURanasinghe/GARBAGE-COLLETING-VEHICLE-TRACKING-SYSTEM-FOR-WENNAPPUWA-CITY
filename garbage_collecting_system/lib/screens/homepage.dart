@@ -14,35 +14,38 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: GpsServices.determinePosition(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text("Something went wrong"),
+      body: SafeArea(
+        child: FutureBuilder(
+          future: GpsServices.determinePosition(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text("Something went wrong"),
+              );
+            }
+            Position position = snapshot.data!;
+
+            return GoogleMap(
+              mapType: MapType.hybrid,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(position.latitude, position.longitude),
+                zoom: 15.5,
+              ),
+              markers: {
+                Marker(
+                    markerId: const MarkerId("My Location"),
+                    position: LatLng(position.latitude, position.longitude),
+                    icon: BitmapDescriptor.defaultMarker,
+                    infoWindow: InfoWindow(
+                      onTap: () => const Text("My Location"),
+                    ))
+              },
             );
-          }
-          Position position = snapshot.data!;
-          print("${position.latitude} lat  , ${position.longitude} lomg");
-          return GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: LatLng(position.latitude, position.longitude),
-              zoom: 14.5,
-            ),
-            markers: {
-              Marker(
-                  markerId: const MarkerId("My Location"),
-                  position: LatLng(position.latitude, position.longitude),
-                  icon: BitmapDescriptor.defaultMarker,
-                  infoWindow: InfoWindow(
-                    onTap: () => const Text("My Location"),
-                  ))
-            },
-          );
-        },
+          },
+        ),
       ),
     );
   }
