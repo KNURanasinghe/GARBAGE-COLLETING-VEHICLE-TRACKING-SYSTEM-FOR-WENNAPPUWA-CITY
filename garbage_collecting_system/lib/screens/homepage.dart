@@ -1,19 +1,18 @@
 import 'dart:async';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:garbage_collecting_system/services/gps_Services.dart';
+import 'package:garbage_collecting_system/services/notofication_Controller.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 import '../services/direction_Matrix.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import '../services/notification.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -77,8 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     currentLocation();
 
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+        onNotificationCreatedMethod:
+            NotificationController.onNotificationCreatedMethod,
+        onDismissActionReceivedMethod:
+            NotificationController.onDismissActionReceivedMethod,
+        onNotificationDisplayedMethod:
+            NotificationController.onNotificationDisplayMethod);
+
     super.initState();
-    LocalNotification.initialize(flutterLocalNotificationsPlugin);
+
     // Use Future.delayed to wait for the initial build to complete
     Future.delayed(Duration.zero, () async {
       // Get the current position
@@ -94,11 +102,14 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         setState(() {
           if (distance <= 1000) {
-            LocalNotification.showBigTextNotification(
-                title: "The vehicle is coming!",
-                body:
-                    "the vehical comming zoom to your place be ready with garbage",
-                fln: flutterLocalNotificationsPlugin);
+            AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                  id: 1,
+                  channelKey: "basic_channel",
+                  title: "Your Garbage vehicle is comming",
+                  body:
+                      "get ready to put garbage to vehicle, vehicle is comming soon, that is near 1km to your place"),
+            );
           }
         });
       }
