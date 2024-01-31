@@ -9,8 +9,12 @@ import 'package:location/location.dart';
 
 import '../services/direction_Matrix.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
+
+import '../services/notification.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -32,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void getPolyPoints(Position currentPosition) async {
     PolylinePoints polylinePoints = PolylinePoints();
-
 
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       "AIzaSyBoGERTsP5zZAxAoqquJGKQcGHimn-ybbs",
@@ -75,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
     currentLocation();
 
     super.initState();
-    Notification.initialize(flutterLocalNotificationsPlugin);
+    LocalNotification.initialize(flutterLocalNotificationsPlugin);
     // Use Future.delayed to wait for the initial build to complete
     Future.delayed(Duration.zero, () async {
       // Get the current position
@@ -89,7 +92,15 @@ class _HomeScreenState extends State<HomeScreen> {
           LatLng(position.latitude, position.longitude),
           LatLng(dest.latitude, dest.longitude),
         );
-        setState(() {});
+        setState(() {
+          if (distance <= 1000) {
+            LocalNotification.showBigTextNotification(
+                title: "The vehicle is coming!",
+                body:
+                    "the vehical comming zoom to your place be ready with garbage",
+                fln: flutterLocalNotificationsPlugin);
+          }
+        });
       }
     });
   }
