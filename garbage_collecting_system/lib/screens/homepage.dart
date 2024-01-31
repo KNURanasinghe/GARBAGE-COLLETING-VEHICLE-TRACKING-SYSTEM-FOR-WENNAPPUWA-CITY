@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void getPolyPoints(Position currentPosition) async {
     print("Fetching polyline points...");
     PolylinePoints polylinePoints = PolylinePoints();
-
+print("Fetching polyline points...11");
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       "AIzaSyBoGERTsP5zZAxAoqquJGKQcGHimn-ybbs",
       PointLatLng(currentPosition.latitude, currentPosition.longitude),
@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (result.points.isNotEmpty) {
+      print("Fetching polyline points...122");
       for (var element in result.points) {
         polilinecoordinate.add(LatLng(element.latitude, element.longitude));
       }
@@ -70,50 +71,56 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //handle local notification
 
-  @override
-  void initState() {
-    // currentLocation();
+ @override
+void initState() {
+  // currentLocation();
 
-    AwesomeNotifications().setListeners(
-        onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-        onNotificationCreatedMethod:
-            NotificationController.onNotificationCreatedMethod,
-        onDismissActionReceivedMethod:
-            NotificationController.onDismissActionReceivedMethod,
-        onNotificationDisplayedMethod:
-            NotificationController.onNotificationDisplayMethod);
+  AwesomeNotifications().setListeners(
+    onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+    onNotificationCreatedMethod:
+        NotificationController.onNotificationCreatedMethod,
+    onDismissActionReceivedMethod:
+        NotificationController.onDismissActionReceivedMethod,
+    onNotificationDisplayedMethod:
+        NotificationController.onNotificationDisplayMethod,
+  );
 
-    super.initState();
+  super.initState();
 
-    // Use Future.delayed to wait for the initial build to complete
-    Future.delayed(Duration.zero, () async {
-      // Get the current position
-      Position? position = await GpsServices.determinePosition();
+  // Use Future.delayed to wait for the initial build to complete
+  Future.delayed(Duration.zero, () async {
+    // Get the current position
+    Position? position = await GpsServices.determinePosition();
 
-      // Call getPolyPoints with the current position
-      if (position != null) {
-        getPolyPoints(position);
-        // Get the distance between the current location and destination
-        distance = await apiService.getDistance(
-          LatLng(position.latitude, position.longitude),
-          LatLng(dest.latitude, dest.longitude),
-        );
+    // Call getPolyPoints with the current position
+    if (position != null) {
+      getPolyPoints(position);
+      // Get the distance between the current location and destination
+      distance = await apiService.getDistance(
+        LatLng(position.latitude, position.longitude),
+        LatLng(dest.latitude, dest.longitude),
+      );
 
+      try {
         if (distance <= 1000) {
           print("$distance distt");
           AwesomeNotifications().createNotification(
             content: NotificationContent(
               id: 1,
               channelKey: "basic_channel",
-              title: "Your Garbage vehicle is comming",
+              title: "Your Garbage vehicle is coming",
               body:
-                  "get ready to put garbage to vehicle, vehicle is comming soon, that is near 1km to your place",
+                  "Get ready to put garbage to the vehicle. The vehicle is coming soon, within 1km of your place.",
             ),
           );
         }
+      } catch (e) {
+        print("Error creating notification: $e");
       }
-    });
-  }
+    }
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {

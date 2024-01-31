@@ -4,7 +4,7 @@ class NotificationController{
 
   @pragma('vm:entry-point')
   static Future<void> onNotificationCreatedMethod(ReceivedNotification receivedNotification)async{
-
+ print("Notification created: $receivedNotification");
   }
     @pragma('vm:entry-point')
   static Future<void> onNotificationDisplayMethod(ReceivedNotification receivedNotification)async{
