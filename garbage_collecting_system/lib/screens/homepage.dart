@@ -2,17 +2,14 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:garbage_collecting_system/services/gps_Services.dart';
-import 'package:garbage_collecting_system/services/notofication_Controller.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 import '../services/direction_Matrix.dart';
-import '../services/notification.dart';
-
+import '../services/notofication_Controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int distance = 0;
 
   void getPolyPoints(Position currentPosition) async {
+    print("Fetching polyline points...");
     PolylinePoints polylinePoints = PolylinePoints();
 
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
@@ -50,31 +48,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // This is to get the current location of the garbage truck
-  void currentLocation() async {
-    Location location = Location();
+  // void currentLocation() async {
+  //   Location location = Location();
 
-    location.getLocation().then((location) {
-      currentlocation1 = location;
-    });
+  //   location.getLocation().then((location) {
+  //     currentlocation1 = location;
+  //   });
 
-    GoogleMapController googleMapController = await _controller.future;
-    location.onLocationChanged.listen((event) {
-      currentlocation1 = event;
+  //   GoogleMapController googleMapController = await _controller.future;
+  //   location.onLocationChanged.listen((event) {
+  //     currentlocation1 = event;
 
-      googleMapController.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: LatLng(event.latitude!, event.longitude!)),
-        ),
-      );
-      setState(() {});
-    });
-  }
+  //     googleMapController.animateCamera(
+  //       CameraUpdate.newCameraPosition(
+  //         CameraPosition(target: LatLng(event.latitude!, event.longitude!)),
+  //       ),
+  //     );
+  //     setState(() {});
+  //   });
+  // }
 
   //handle local notification
 
   @override
   void initState() {
-    currentLocation();
+    // currentLocation();
 
     AwesomeNotifications().setListeners(
         onActionReceivedMethod: NotificationController.onActionReceivedMethod,
@@ -100,18 +98,19 @@ class _HomeScreenState extends State<HomeScreen> {
           LatLng(position.latitude, position.longitude),
           LatLng(dest.latitude, dest.longitude),
         );
-        setState(() {
-          if (distance <= 1000) {
-            AwesomeNotifications().createNotification(
-              content: NotificationContent(
-                  id: 1,
-                  channelKey: "basic_channel",
-                  title: "Your Garbage vehicle is comming",
-                  body:
-                      "get ready to put garbage to vehicle, vehicle is comming soon, that is near 1km to your place"),
-            );
-          }
-        });
+
+        if (distance <= 1000) {
+          print("$distance distt");
+          AwesomeNotifications().createNotification(
+            content: NotificationContent(
+              id: 1,
+              channelKey: "basic_channel",
+              title: "Your Garbage vehicle is comming",
+              body:
+                  "get ready to put garbage to vehicle, vehicle is comming soon, that is near 1km to your place",
+            ),
+          );
+        }
       }
     });
   }

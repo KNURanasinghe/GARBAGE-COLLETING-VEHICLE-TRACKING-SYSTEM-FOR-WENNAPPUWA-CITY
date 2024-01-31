@@ -113,6 +113,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  flogger:
+    dependency: "direct main"
+    description:
+      name: flogger
+      sha256: "59f031a7860c3a4dcf214b15be4e4d43d644af02bec3946a0926b8f512cf95bd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.8"
   flutter:
     dependency: "direct main"
     description: flutter
