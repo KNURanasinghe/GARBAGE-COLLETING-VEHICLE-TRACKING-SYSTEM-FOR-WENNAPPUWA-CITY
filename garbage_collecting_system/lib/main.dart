@@ -1,7 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-
-import 'screens/homepage.dart';
+import 'package:garbage_collecting_system/screens/signUp.dart';
 
 void main() async {
   await AwesomeNotifications().initialize(null, [
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      home: const SignUpPage(),
     );
   }
 }
