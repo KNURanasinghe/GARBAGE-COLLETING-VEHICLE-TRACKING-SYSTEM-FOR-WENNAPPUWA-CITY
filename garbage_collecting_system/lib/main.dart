@@ -4,25 +4,22 @@ import 'package:flutter/material.dart';
 import 'screens/homepage.dart';
 
 void main() async {
-  await AwesomeNotifications().initialize(null, [
-    NotificationChannel(
-      channelGroupKey: "basic_channel_group",
-      channelKey: "basic_channel",
-      channelName: "Basic Notification",
-      channelDescription: "Basic notification channel",
-    )
-  ], channelGroups: [
-    NotificationChannelGroup(
-      channelGroupKey: "basic_channel_group",
-      channelGroupName: "basic group",
-    )
-  ]);
+   WidgetsFlutterBinding.ensureInitialized();
 
-  bool isAllowedToSendNotification =
-      await AwesomeNotifications().isNotificationAllowed();
-  if (!isAllowedToSendNotification) {
-    AwesomeNotifications().requestPermissionToSendNotifications();
-  }
+  // Initialize Awesome Notifications
+  AwesomeNotifications().initialize(
+    // Set the 'app_icon' to the name of your app's launcher icon
+    'resource://drawable/app_icon',
+    [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic notifications',
+        channelDescription: 'Notification channel for basic notifications',
+        defaultColor: Colors.blue,
+        ledColor: Colors.white,
+      ),
+    ],
+  );
   runApp(const MyApp());
 }
 

@@ -1,200 +1,117 @@
 import 'dart:async';
-
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:garbage_collecting_system/services/gps_Services.dart';
+import 'package:garbage_collecting_system/services/myLocation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-
-import '../services/direction_Matrix.dart';
-import '../services/notofication_Controller.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => MapSampleState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final Completer<GoogleMapController> _controller = Completer();
+class MapSampleState extends State<HomeScreen> {
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+  LatLng destination = const LatLng(8.650414,81.211639);
 
-  GoogleMapsApiService apiService =
-      GoogleMapsApiService('AIzaSyBoGERTsP5zZAxAoqquJGKQcGHimn-ybbs');
-
-  LatLng dest = const LatLng(8.648013, 81.201729);
-
-  List<LatLng> polilinecoordinate = [];
-  LocationData? currentlocation1;
-  int distance = 0;
-
-  void getPolyPoints(Position currentPosition) async {
-    print("Fetching polyline points...");
-    PolylinePoints polylinePoints = PolylinePoints();
-    print("Fetching polyline points...11");
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      "AIzaSyBoGERTsP5zZAxAoqquJGKQcGHimn-ybbs",
-      PointLatLng(currentPosition.latitude, currentPosition.longitude),
-      PointLatLng(dest.latitude, dest.longitude),
-    );
-
-    if (result.points.isNotEmpty) {
-      print("Fetching polyline points...122");
-      for (var element in result.points) {
-        polilinecoordinate.add(LatLng(element.latitude, element.longitude));
-      }
-    }
-  }
-
-  // This is to get the current location of the garbage truck
-  // void currentLocation() async {
-  //   Location location = Location();
-
-  //   location.getLocation().then((location) {
-  //     currentlocation1 = location;
-  //   });
-
-  //   GoogleMapController googleMapController = await _controller.future;
-  //   location.onLocationChanged.listen((event) {
-  //     currentlocation1 = event;
-
-  //     googleMapController.animateCamera(
-  //       CameraUpdate.newCameraPosition(
-  //         CameraPosition(target: LatLng(event.latitude!, event.longitude!)),
-  //       ),
-  //     );
-  //     setState(() {});
-  //   });
-  // }
-
-  //handle local notification
+  double distance = 0.0;
 
   @override
   void initState() {
-    // currentLocation();
-
-    AwesomeNotifications().setListeners(
-      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-      onNotificationCreatedMethod:
-          NotificationController.onNotificationCreatedMethod,
-      onDismissActionReceivedMethod:
-          NotificationController.onDismissActionReceivedMethod,
-      onNotificationDisplayedMethod:
-          NotificationController.onNotificationDisplayMethod,
-    );
-
     super.initState();
+    AwesomeNotifications().initialize(null, [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic notifications',
+        channelDescription: 'Notification channel for basic notifications',
+        defaultColor: Colors.blue,
+        ledColor: Colors.white,
+      ),
+    ]);
+  }
 
-    // Use Future.delayed to wait for the initial build to complete
-    Future.delayed(Duration.zero, () async {
-      // Get the current position
-      Position? position = await GpsServices.determinePosition();
-      print("${position!.latitude} distt");
-      // Call getPolyPoints with the current position
-      getPolyPoints(position);
-      // Get the distance between the current location and destination
-      distance = await apiService.getDistance(
-        LatLng(position.latitude, position.longitude),
-        LatLng(dest.latitude, dest.longitude),
-      );
-
-      try {
-        if (distance <= 1000) {
-          print("$distance distt");
-          AwesomeNotifications().createNotification(
-            content: NotificationContent(
-              id: 1,
-              channelKey: "basic_channel",
-              title: "Your Garbage vehicle is coming",
-              body:
-                  "Get ready to put garbage to the vehicle. The vehicle is coming soon, within 1km of your place.",
-            ),
-          );
-        }
-      } catch (e) {
-        print("Error creating notification: $e");
-      }
-    });
+  Future<void> _sendNotification() async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 1,
+        channelKey: 'basic_channel',
+        title: 'Distance Alert',
+        body: 'You are within 1000 meters of your destination!',
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "Garbage Collection System",
-            style: TextStyle(color: Colors.black, fontSize: 16),
-          ),
-          foregroundColor: Colors.blue,
-          backgroundColor: Colors.blue,
-        ),
-        body: FutureBuilder(
-          future: GpsServices.determinePosition(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return const Center(
-                child: Text("Something went wrong"),
-              );
-            }
-            Position position = snapshot.data!;
-
-            return GoogleMap(
-              mapType: MapType.normal,
-              circles: {
-                Circle(
-                  circleId: const CircleId("My Location"),
-                  radius: 425,
-                  center: LatLng(position.latitude, position.longitude),
-                  strokeWidth: 2,
-                  fillColor: const Color(0xFF006491).withOpacity(0.2),
-                ),
-              },
-              initialCameraPosition: CameraPosition(
-                target: LatLng(position.latitude, position.longitude),
-                zoom: 14.5,
-              ),
-              polylines: {
-                
-                Polyline(
-                  
-                  polylineId: const PolylineId("routes"),
-                  points: polilinecoordinate,
-                  color: Colors.blue,
-                  width: 6,
-                )
-              },
-              markers: {
-                Marker(
-                  markerId: const MarkerId("My Location"),
-                  position: LatLng(position.latitude, position.longitude),
-                  icon: BitmapDescriptor.defaultMarker,
-                  infoWindow: InfoWindow(
-                    onTap: () => const Text("My Location"),
-                  ),
-                ),
-                Marker(
-                  markerId: const MarkerId("My des"),
-                  position: dest,
-                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueBlue,
-                  ),
-                  infoWindow: InfoWindow(
-                    onTap: () => const Text("My destination"),
-                  ),
-                ),
-              },
-              onMapCreated: (mapController) {
-                _controller.complete(mapController);
-              },
+    return Scaffold(
+      body: FutureBuilder(
+        future: ApiService.determinePosition(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
             );
-          },
-        ),
+          }
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("Something went wrong"),
+            );
+          }
+          Position position = snapshot.data!;
+
+          // Calculate distance between current location and destination
+          distance = Geolocator.distanceBetween(
+            position.latitude,
+            position.longitude,
+            destination.latitude,
+            destination.longitude,
+          );
+
+          if (distance <= 1000) {
+            _sendNotification();
+          }
+
+          return Column(
+            children: [
+              Expanded(
+                child: GoogleMap(
+                  mapType: MapType.hybrid,
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(position.latitude, position.longitude),
+                    zoom: 13.5,
+                  ),
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId("my location"),
+                      icon: BitmapDescriptor.defaultMarker,
+                      position: LatLng(position.latitude, position.longitude),
+                    ),
+                    Marker(
+                      markerId: const MarkerId("my location"),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueMagenta,
+                      ),
+                      position: destination,
+                    )
+                  },
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Distance to destination: ${distance.toStringAsFixed(2)} meters',
+                  style: TextStyle(fontSize: 18.0),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
