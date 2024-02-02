@@ -28,9 +28,9 @@ class _SignInPageState extends State<SignUpPage> {
           Uri.parse("http://192.168.8.111:3000/registration"),
           headers: {"Content-type": "application/json"},
           body: jsonEncode(regBody));
-      print("somethind went wrong ....$response");
+      
       var jsonResponse = jsonDecode(response.body);
-      print("somethind went wrong ....$jsonResponse");
+     
       if (jsonResponse['status'] == true) {
         Navigator.push(
             context,
@@ -38,7 +38,7 @@ class _SignInPageState extends State<SignUpPage> {
               builder: (context) => const LoginPage(),
             ));
       } else {
-        print("somethind went wrong");
+       
       }
     } else {
       setState(() {

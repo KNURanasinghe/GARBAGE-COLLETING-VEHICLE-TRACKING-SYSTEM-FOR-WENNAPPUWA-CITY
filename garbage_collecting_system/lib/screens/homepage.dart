@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void getPolyPoints(Position currentPosition) async {
     print("Fetching polyline points...");
     PolylinePoints polylinePoints = PolylinePoints();
-print("Fetching polyline points...11");
+    print("Fetching polyline points...11");
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       "AIzaSyBoGERTsP5zZAxAoqquJGKQcGHimn-ybbs",
       PointLatLng(currentPosition.latitude, currentPosition.longitude),
@@ -71,29 +71,28 @@ print("Fetching polyline points...11");
 
   //handle local notification
 
- @override
-void initState() {
-  // currentLocation();
+  @override
+  void initState() {
+    // currentLocation();
 
-  AwesomeNotifications().setListeners(
-    onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-    onNotificationCreatedMethod:
-        NotificationController.onNotificationCreatedMethod,
-    onDismissActionReceivedMethod:
-        NotificationController.onDismissActionReceivedMethod,
-    onNotificationDisplayedMethod:
-        NotificationController.onNotificationDisplayMethod,
-  );
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayMethod,
+    );
 
-  super.initState();
+    super.initState();
 
-  // Use Future.delayed to wait for the initial build to complete
-  Future.delayed(Duration.zero, () async {
-    // Get the current position
-    Position? position = await GpsServices.determinePosition();
-
-    // Call getPolyPoints with the current position
-    if (position != null) {
+    // Use Future.delayed to wait for the initial build to complete
+    Future.delayed(Duration.zero, () async {
+      // Get the current position
+      Position? position = await GpsServices.determinePosition();
+      print("${position!.latitude} distt");
+      // Call getPolyPoints with the current position
       getPolyPoints(position);
       // Get the distance between the current location and destination
       distance = await apiService.getDistance(
@@ -117,10 +116,8 @@ void initState() {
       } catch (e) {
         print("Error creating notification: $e");
       }
-    }
-  });
-}
-
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +145,7 @@ void initState() {
             Position position = snapshot.data!;
 
             return GoogleMap(
-              mapType: MapType.hybrid,
+              mapType: MapType.normal,
               circles: {
                 Circle(
                   circleId: const CircleId("My Location"),
@@ -163,7 +160,9 @@ void initState() {
                 zoom: 14.5,
               ),
               polylines: {
+                
                 Polyline(
+                  
                   polylineId: const PolylineId("routes"),
                   points: polilinecoordinate,
                   color: Colors.blue,
