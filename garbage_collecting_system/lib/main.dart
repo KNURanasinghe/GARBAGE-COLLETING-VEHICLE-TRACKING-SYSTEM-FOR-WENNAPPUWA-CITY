@@ -1,11 +1,16 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:garbage_collecting_system/screens/homepage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'screens/homepage.dart';
+import 'screens/login.dart';
 import 'screens/signUp.dart';
 
 void main() async {
-   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  //user keep login for 1h
+  SharedPreferences pref = await SharedPreferences.getInstance();
 
   // Initialize Awesome Notifications
   AwesomeNotifications().initialize(
@@ -21,11 +26,15 @@ void main() async {
       ),
     ],
   );
-  runApp(const MyApp());
+  runApp(MyApp(
+    token: pref.getString('token'),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  // ignore: prefer_typing_uninitialized_variables
+  final token;
+  const MyApp({super.key, required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +45,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SignUpPage(),
+      home: token == null
+          ? const SignUpPage()
+          : (JwtDecoder.isExpired(token) == false)
+              ? HomeScreen(token: token)
+              : const LoginPage(),
     );
   }
 }

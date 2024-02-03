@@ -1,12 +1,14 @@
 import 'dart:async';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:garbage_collecting_system/services/myLocation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final token;
+  const HomeScreen({Key? key, required this.token}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => MapSampleState();
@@ -15,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 class MapSampleState extends State<HomeScreen> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  LatLng destination = const LatLng(8.650414,81.211639);
+  LatLng destination = const LatLng(8.650414, 81.211639);
 
   double distance = 0.0;
 
@@ -39,7 +41,7 @@ class MapSampleState extends State<HomeScreen> {
         id: 1,
         channelKey: 'basic_channel',
         title: 'Distance Alert',
-        body: 'You are within 1000 meters of your destination!',
+        body: 'Garbage Truck within 1000 meters of your Location!',
       ),
     );
   }
@@ -100,13 +102,6 @@ class MapSampleState extends State<HomeScreen> {
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
                   },
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Distance to destination: ${distance.toStringAsFixed(2)} meters',
-                  style: TextStyle(fontSize: 18.0),
                 ),
               ),
             ],

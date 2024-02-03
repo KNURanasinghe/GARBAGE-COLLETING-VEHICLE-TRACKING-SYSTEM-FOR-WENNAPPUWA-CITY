@@ -12,15 +12,15 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignUpPage> {
-  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
 
   TextEditingController passwordController = TextEditingController();
   bool _isNotValidate = false;
 
   void registerUser() async {
-    if (nameController.text.isNotEmpty && passwordController.text.isNotEmpty) {
+    if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
       var regBody = {
-        "email": nameController.text,
+        "email": emailController.text,
         "password": passwordController.text
       };
 
@@ -28,18 +28,16 @@ class _SignInPageState extends State<SignUpPage> {
           Uri.parse("http://192.168.8.111:3000/registration"),
           headers: {"Content-type": "application/json"},
           body: jsonEncode(regBody));
-      
+
       var jsonResponse = jsonDecode(response.body);
-     
+
       if (jsonResponse['status'] == true) {
         Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const LoginPage(),
             ));
-      } else {
-       
-      }
+      } else {}
     } else {
       setState(() {
         _isNotValidate = true;
@@ -81,9 +79,9 @@ class _SignInPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextField(
-                    controller: nameController,
+                    controller: emailController,
                     decoration: InputDecoration(
-                        labelText: 'Name',
+                        labelText: 'email',
                         errorText: _isNotValidate ? "fill the field" : null),
                   ),
                   const SizedBox(height: 16.0),
