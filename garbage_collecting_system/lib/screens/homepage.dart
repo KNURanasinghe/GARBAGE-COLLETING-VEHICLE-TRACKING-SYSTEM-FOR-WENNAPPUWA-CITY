@@ -42,7 +42,7 @@ class MapSampleState extends State<HomeScreen> {
         id: 1,
         channelKey: 'basic_channel',
         title: 'Distance Alert',
-        body: 'Garbage Truck within 1000 meters of your Location!',
+        body: 'Garbage Truck within 1 KM of your Location!',
       ),
     );
   }
