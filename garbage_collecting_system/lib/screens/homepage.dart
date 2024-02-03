@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final token;
   const HomeScreen({Key? key, required this.token}) : super(key: key);
 
